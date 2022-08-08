@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Quiz</title>
+    <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kaushan+Script">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=ABeeZee">
+    <link rel="stylesheet" href="static/assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.1.1/aos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/css/swiper.min.css">
+    <link rel="stylesheet" href="static/assets/css/Simple-Slider.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+    var ans=[];
+    var corrans=[];
+      
+            function getAnswers()
+            {
+                document.getElementById('UserAnswers').innerHTML=" ";               
+                var e=document.getElementsByTagName('input');
+                for(i=0;i<e.length;i++)
+                {
+                    if(e[i].type=='hidden')
+                    {
+                        corrans.push(e[i].value);
+                    }    
+                    console.log(corrans);    
+                    console.log(e[i].type);
+                    if(e[i].type=='radio')
+                    {
+                        if(e[i].checked)
+                        {
+                            ans.push(e[i].value);  
+                            document.getElementById('UserAnswers').innerHTML+="Q" + e[i].name + "The answer you have selected :" + e[i].value + "<br/>";
+                            
+                        }
+                    }
+                }
+                console.log(ans);
+            }
+        $(document).ready(function()
+        {
+            $("#but1").click(function()
+            {
+                $(".rb").show();
+                $(".rb").attr("disabled",true);
+            });
+
+            
+        
+            document.getElementById('submitButton').addEventListener('click', function(e)
+            {
+                e.preventDefault();
+                console.log(ans);
+                //document.getElementsByName('userans').value = JSON.stringify(ans);
+                /*var fd = new FormData(document.getElementsByTagName("input"));
+                for (var i = 0; i < ans.length; i++) {
+                    fd.append('userans[]', ans[i]);
+                }*/
+                fetch('/checkanswer', {
+                    method: 'POST', 
+                    mode: 'cors', 
+                    cache: 'no-cache', 
+                    credentials: 'same-origin', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    redirect: 'follow',
+                    referrerPolicy: 'no-referrer', 
+                    body: JSON.stringify({"userans" : ans,"cans" : corrans})
+                });
+            });
+
+        });
+        
+        
+        
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark navbar-expand-lg fixed-top bg-dark" id="mainNav"> 
+        <div class="container"><a class="navbar-brand" href="#page-top"
+                style="font-size: 39px;font-family: 'Droid Serif';">Quizzard</a><button data-toggle="collapse"
+                data-target="#navbarResponsive" class="navbar-toggler navbar-toggler-right" type="button"
+                data-toogle="collapse" aria-controls="navbarResponsive" aria-expanded="false"
+                aria-label="Toggle navigation"><i class="fa fa-bars"></i></button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="nav navbar-nav ml-auto text-uppercase">
+                    <li class="nav-item" role="presentation"><a class="nav-link js-scroll-trigger"
+                            data-bs-hover-animate="pulse" href="/userhome">Home</a></li>
+                    <li class="nav-item" role="presentation"></li>
+                </ul>
+            </div>
+        </div>
+    </nav>  
+
+    <div style="margin-top: 250px;margin-left: 50px;">
+    {% for item in value %}
+    <!-- <form action="/checkanswer" , method="POST"> -->
+        <table>
+            <tr>
+                <td>{{item[1]}} ) {{item[0][0]}}</td>
+            </tr>
+            <tr>
+                <td><input type="radio" id="option1" class="rb" name="{{item[1]}}" value="{{item[0][1]}}">{{item[0][1]}}</td>
+            </tr>
+            <tr>
+                <td><input type="radio" id="option2" class="rb" name="{{item[1]}}" value="{{item[0][2]}}">{{item[0][2]}}</td>
+            </tr>
+            <tr>
+                <td><input type="radio" id="option3" class="rb" name="{{item[1]}}" value="{{item[0][3]}}">{{item[0][3]}}</td>
+            </tr>
+            <tr>
+                <td><input type="radio" id="option4" class="rb" name="{{item[1]}}" value="{{item[0][4]}}">{{item[0][4]}}</td>
+            </tr>
+            <tr>
+                <td><label id="corans" class="rb" style="display: none;color: green"><b>{{item[0][5]}}</b></label></td>
+                <td><input type="hidden" id="corans" class="rb" style="display: none;color: green" value="{{item[0][5]}}"></td>
+            </tr>
+        </table>
+        <br>
+  
+    {% endfor %}
+    <!-- <input type="submit" value="CHeck Answer" />
+    </form>   -->
+    <input type="submit" value="Click for Results" id="submitButton" onclick="getAnswers();"/>
+    <br>
+    <b id="UserAnswers" style="color: green"></b>
+    
+    <form name="input" action="/score">
+        <!-- <input type="hidden" name="userans[]" id="myans"  >        -->
+        <input type ="submit" value="Submit" >
+    </form>
+    </div>
+    <script src="static/assets/js/jquery.min.js"></script>
+    <script src="static/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="static/assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.1.1/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+    <script src="static/assets/js/agency.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/js/swiper.jquery.min.js"></script>
+    <script src="static/assets/js/Simple-Slider.js"></script>
+</body>
+
+</html>
